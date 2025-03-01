@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
     '@pinia/nuxt',
+    '@vueuse/nuxt',
   ],
   nitro: {
     esbuild: {
