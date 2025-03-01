@@ -9,7 +9,12 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['@vuestic/nuxt', '@nuxtjs/tailwindcss', '@nuxt/eslint'],
+  modules: [
+    '@vuestic/nuxt',
+    '@nuxtjs/tailwindcss',
+    '@nuxt/eslint',
+    '@pinia/nuxt',
+  ],
   nitro: {
     esbuild: {
       options: {

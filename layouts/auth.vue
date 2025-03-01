@@ -35,7 +35,7 @@ const breakpoint = useBreakpoint()
           <div class="flex flex-col items-start">
             <div class="py-4">
               <h1
-                class="dark:text-primary font-semibold sm:text-3xl text-4xl text-black text-center"
+                class="text-primary font-semibold sm:text-3xl text-4xl text-center"
               >
                 Welcome
               </h1>
