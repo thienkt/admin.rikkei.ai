@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: false,
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   postcss: {
@@ -7,6 +8,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  css: ['~/assets/css/main.css'],
   modules: ['@vuestic/nuxt', '@nuxtjs/tailwindcss', '@nuxt/eslint'],
   nitro: {
     esbuild: {
