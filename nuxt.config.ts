@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
   nitro: {
-    preset: "static",
+    preset: 'static',
     esbuild: {
       options: {
         target: 'esnext',

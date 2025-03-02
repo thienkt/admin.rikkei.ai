@@ -2,7 +2,7 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
-import { validators } from '@/utils/validators'
+import { validators } from '@/utils'
 
 definePageMeta({
   layout: 'auth',

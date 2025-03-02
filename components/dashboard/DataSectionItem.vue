@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {VaCard, VaCardContent} from 'vuestic-ui'
+import { computed } from 'vue'
+import { VaCard, VaCardContent } from 'vuestic-ui'
 
 const props = defineProps<{
   title: string
@@ -24,8 +24,8 @@ const changeClass = computed(() => ({
         <header class="flex items-center justify-between">
           <div class="text-lg font-semibold grow">{{ value }}</div>
           <div
-              class="p-1 rounded"
-              :style="{
+            class="p-1 rounded"
+            :style="{
               backgroundColor: iconBackground,
               color: iconColor,
             }"

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {storeToRefs} from 'pinia'
-import {useGlobalStore} from '@/stores/global'
+import { storeToRefs } from 'pinia'
+import { useGlobalStore } from '@/stores/global'
 
 defineProps({
-  isMobile: {type: Boolean, default: false},
+  isMobile: { type: Boolean, default: false },
 })
 
 const GlobalStore = useGlobalStore()
 
-const {isSidebarMinimized} = storeToRefs(GlobalStore)
+const { isSidebarMinimized } = storeToRefs(GlobalStore)
 </script>
 
 <template>
@@ -17,16 +17,16 @@ const {isSidebarMinimized} = storeToRefs(GlobalStore)
       <div class="left">
         <Transition v-if="isMobile" name="icon-fade" mode="out-in">
           <VaIcon
-              color="primary"
-              :name="isSidebarMinimized ? 'menu' : 'close'"
-              size="24px"
-              style="margin-top: 3px"
-              @click="isSidebarMinimized = !isSidebarMinimized"
+            color="primary"
+            :name="isSidebarMinimized ? 'menu' : 'close'"
+            size="24px"
+            style="margin-top: 3px"
+            @click="isSidebarMinimized = !isSidebarMinimized"
           />
         </Transition>
         <RouterLink to="/" aria-label="Visit home page">
           <h1
-              class="text-primary font-semibold sm:text-3xl text-4xl text-center"
+            class="text-primary font-semibold sm:text-3xl text-4xl text-center"
           >
             Logo
           </h1>
@@ -36,15 +36,16 @@ const {isSidebarMinimized} = storeToRefs(GlobalStore)
     <template #right>
       <div class="flex justify-end items-center">
         <VaAvatar :size="32" color="warning">
-          <img src="https://avatars.githubusercontent.com/u/135550293?v=4"
-               alt="avatar">
+          <img
+            src="https://avatars.githubusercontent.com/u/135550293?v=4"
+            alt="avatar"
+          />
         </VaAvatar>
-        <span class="leading-normal align-middle min-w-max ml-2 mr-1 text-lg">admin@rikkeisoft.com</span>
-        <VaButton
-            preset="secondary"
-            color="textPrimary"
+        <span class="leading-normal align-middle min-w-max ml-2 mr-1 text-lg"
+          >admin@rikkeisoft.com</span
         >
-          <VaIcon name="logout" size="large"/>
+        <VaButton preset="secondary" color="textPrimary">
+          <VaIcon name="logout" size="large" />
         </VaButton>
       </div>
     </template>

@@ -61,7 +61,7 @@ const onCloseSidebarButtonClick = () => {
       order: 1,
       overlay: breakpoints.mdDown && !isSidebarMinimized,
     }"
-    @leftOverlayClick="isSidebarMinimized = true"
+    @left-overlay-click="isSidebarMinimized = true"
   >
     <template #top>
       <Navbar :is-mobile="isMobile" />

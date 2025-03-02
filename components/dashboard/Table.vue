@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {defineVaDataTableColumns, useModal} from 'vuestic-ui'
+import { type DataTableColumnSource, useModal } from 'vuestic-ui'
 
-import {type PropType, computed, toRef} from 'vue'
+import { type PropType, computed, toRef } from 'vue'
+
 export type Pagination = {
   page: number
   perPage: number
@@ -13,54 +14,25 @@ export type Sorting = {
   sortingOrder: 'asc' | 'desc' | null
 }
 
-import {useVModel} from '@vueuse/core'
-export type Project = {
-  id: UUID
-  project_name: string
-  project_owner: User['id']
-  team: User['id'][]
-  status: 'important' | 'completed' | 'archived' | 'in progress'
-  created_at: string
-}
-
-export type UserRole = 'admin' | 'user' | 'owner'
-
-export type UUID = `${string}-${string}-${string}-${string}-${string}`
-
-export type User = {
-  id: UUID
-  fullname: string
-  email: string
-  username: string
-  role: UserRole
-  avatar: string
-  projects: UUID[]
-  notes: string
-  active: boolean
-}
-
-const columns = defineVaDataTableColumns([
-  {label: 'Full Name', key: 'fullname', sortable: true},
-  {label: 'Email', key: 'email', sortable: true},
-  {label: 'Username', key: 'username', sortable: true},
-  {label: 'Role', key: 'role', sortable: true},
-  {label: 'Projects', key: 'projects', sortable: true},
-  {label: ' ', key: 'actions', align: 'right'},
-])
+import { useVModel } from '@vueuse/core'
+import type { User } from '@/types'
 
 const props = defineProps({
   users: {
     type: Array as PropType<User[]>,
     required: true,
   },
-  projects: {
-    type: Array as PropType<Project[]>,
+  columns: {
+    type: Array as PropType<DataTableColumnSource<string>[]>,
     required: true,
   },
-  loading: {type: Boolean, default: false},
-  pagination: {type: Object as PropType<Pagination>, required: true},
-  sortBy: {type: String as PropType<Sorting['sortBy']>, required: true},
-  sortingOrder: {type: String as PropType<Sorting['sortingOrder']>, default: null},
+  loading: { type: Boolean, default: false },
+  pagination: { type: Object as PropType<Pagination>, required: false },
+  sortBy: { type: String as PropType<Sorting['sortBy']>, required: true },
+  sortingOrder: {
+    type: String as PropType<Sorting['sortingOrder']>,
+    default: null,
+  },
 })
 
 const emit = defineEmits<{
@@ -74,20 +46,18 @@ const users = toRef(props, 'users')
 const sortByVModel = useVModel(props, 'sortBy', emit)
 const sortingOrderVModel = useVModel(props, 'sortingOrder', emit)
 
-const roleColors: Record<UserRole, string> = {
-  admin: 'danger',
-  user: 'background-element',
-  owner: 'warning',
-}
+const totalPages = computed(() =>
+  props.pagination
+    ? Math.ceil(props.pagination.total / props.pagination.perPage)
+    : 0,
+)
 
-const totalPages = computed(() => Math.ceil(props.pagination.total / props.pagination.perPage))
-
-const {confirm} = useModal()
+const { confirm } = useModal()
 
 const onUserDelete = async (user: User) => {
   const agreed = await confirm({
     title: 'Delete user',
-    message: `Are you sure you want to delete ${user.fullname}?`,
+    message: `Are you sure you want to delete ${user.email}?`,
     okText: 'Delete',
     cancelText: 'Cancel',
     size: 'small',
@@ -99,120 +69,105 @@ const onUserDelete = async (user: User) => {
   }
 }
 
-const formatProjectNames = (projects: Project['id'][]) => {
-  const names = projects.reduce((acc, p) => {
-    const project = props.projects?.find(({id}) => p === id)
-
-    if (project) {
-      acc.push(project.project_name)
-    }
-
-    return acc
-  }, [] as string[])
-  if (names.length === 0) return 'No projects'
-  if (names.length <= 2) {
-    return names.map((name: any) => name).join(', ')
-  }
-
-  return (
-      names
-          .slice(0, 2)
-          .map((name: any) => name)
-          .join(', ') +
-      ' + ' +
-      (names.length - 2) +
-      ' more'
-  )
-}
+const formatDate = (date: string) => new Date(date).toLocaleString()
 </script>
 
 <template>
   <VaDataTable
-      v-model:sort-by="sortByVModel"
-      v-model:sorting-order="sortingOrderVModel"
-      :columns="columns"
-      :items="users"
-      :loading="$props.loading"
+    v-model:sort-by="sortByVModel"
+    v-model:sorting-order="sortingOrderVModel"
+    :columns="columns"
+    :items="users"
+    :loading="$props.loading"
   >
-    <template #cell(fullname)="{ rowData }">
-      <div class="flex items-center gap-2 max-w-[230px] ellipsis">
-        {{ rowData.fullname }}
-      </div>
-    </template>
-
-    <template #cell(username)="{ rowData }">
-      <div class="max-w-[120px] ellipsis">
-        {{ rowData.username }}
-      </div>
-    </template>
-
     <template #cell(email)="{ rowData }">
-      <div class="ellipsis max-w-[230px]">
+      <div class="flex items-center gap-2 max-w-[230px] ellipsis">
         {{ rowData.email }}
       </div>
     </template>
 
-    <template #cell(role)="{ rowData }">
-      <VaBadge :text="rowData.role" :color="roleColors[rowData.role as UserRole]"/>
+    <template #cell(ip)="{ rowData }">
+      <div class="max-w-[120px] ellipsis">
+        {{ rowData.ip }}
+      </div>
     </template>
 
-    <template #cell(projects)="{ rowData }">
-      <div class="ellipsis max-w-[300px] lg:max-w-[450px]">
-        {{ formatProjectNames(rowData.projects) }}
+    <template #cell(device)="{ rowData }">
+      <div class="ellipsis max-w-[230px]">
+        {{ rowData.device }}
+      </div>
+    </template>
+
+    <template #cell(time)="{ rowData }">
+      <div class="ellipsis max-w-[230px]">
+        {{ formatDate(rowData.time) }}
+      </div>
+    </template>
+
+    <template #cell(active)="{ rowData }">
+      <div class="ellipsis max-w-[230px]">
+        <VaSwitch v-model="rowData.active" color="info" size="small" />
       </div>
     </template>
 
     <template #cell(actions)="{ rowData }">
       <div class="flex gap-2 justify-end">
         <VaButton
-            preset="primary"
-            size="small"
-            icon="mso-edit"
-            aria-label="Edit user"
-            @click="$emit('edit-user', rowData as User)"
+          preset="primary"
+          size="small"
+          icon="edit"
+          aria-label="Edit user"
+          @click="$emit('edit-user', rowData as User)"
         />
         <VaButton
-            preset="primary"
-            size="small"
-            icon="mso-delete"
-            color="danger"
-            aria-label="Delete user"
-            @click="onUserDelete(rowData as User)"
+          preset="primary"
+          size="small"
+          icon="delete"
+          color="danger"
+          aria-label="Delete user"
+          @click="onUserDelete(rowData as User)"
         />
       </div>
     </template>
   </VaDataTable>
 
-  <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center py-2">
+  <div
+    v-if="$props.pagination"
+    class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center py-2"
+  >
     <div>
       <b>{{ $props.pagination.total }} results.</b>
       Results per page
-      <VaSelect v-model="$props.pagination.perPage" class="!w-20" :options="[10, 50, 100]"/>
+      <VaSelect
+        v-model="$props.pagination.perPage"
+        class="!w-20"
+        :options="[10, 50, 100]"
+      />
     </div>
 
     <div v-if="totalPages > 1" class="flex">
       <VaButton
-          preset="secondary"
-          icon="va-arrow-left"
-          aria-label="Previous page"
-          :disabled="$props.pagination.page === 1"
-          @click="$props.pagination.page--"
+        preset="secondary"
+        icon="va-arrow-left"
+        aria-label="Previous page"
+        :disabled="$props.pagination.page === 1"
+        @click="$props.pagination.page--"
       />
       <VaButton
-          class="mr-2"
-          preset="secondary"
-          icon="va-arrow-right"
-          aria-label="Next page"
-          :disabled="$props.pagination.page === totalPages"
-          @click="$props.pagination.page++"
+        class="mr-2"
+        preset="secondary"
+        icon="va-arrow-right"
+        aria-label="Next page"
+        :disabled="$props.pagination.page === totalPages"
+        @click="$props.pagination.page++"
       />
       <VaPagination
-          v-model="$props.pagination.page"
-          buttons-preset="secondary"
-          :pages="totalPages"
-          :visible-pages="5"
-          :boundary-links="false"
-          :direction-links="false"
+        v-model="$props.pagination.page"
+        buttons-preset="secondary"
+        :pages="totalPages"
+        :visible-pages="5"
+        :boundary-links="false"
+        :direction-links="false"
       />
     </div>
   </div>
@@ -221,5 +176,10 @@ const formatProjectNames = (projects: Project['id'][]) => {
 <style lang="css" scoped>
 ::v-deep(.va-data-table__table-tr) {
   border-bottom: 1px solid var(--va-background-border);
+}
+
+::v-deep(.va-data-table__table-th-wrapper) {
+  font-weight: 500;
+  font-size: 1rem;
 }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {useColors} from 'vuestic-ui'
+import { computed } from 'vue'
+import { useColors } from 'vuestic-ui'
 import DataSectionItem from './DataSectionItem.vue'
 
 interface DashboardMetric {
@@ -14,7 +14,7 @@ interface DashboardMetric {
   iconColor: string
 }
 
-const {getColor} = useColors()
+const { getColor } = useColors()
 
 const dashboardMetrics = computed<DashboardMetric[]>(() => [
   {
@@ -53,19 +53,18 @@ const dashboardMetrics = computed<DashboardMetric[]>(() => [
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
     <DataSectionItem
-        v-for="metric in dashboardMetrics"
-        :key="metric.id"
-        :title="metric.title"
-        :value="metric.value"
-        :change-text="metric.changeText"
-        :up="metric.changeDirection === 'up'"
-        :icon-background="metric.iconBackground"
-        :icon-color="metric.iconColor"
+      v-for="metric in dashboardMetrics"
+      :key="metric.id"
+      :title="metric.title"
+      :value="metric.value"
+      :change-text="metric.changeText"
+      :up="metric.changeDirection === 'up'"
+      :icon-background="metric.iconBackground"
+      :icon-color="metric.iconColor"
     >
       <template #icon>
-        <VaIcon :name="metric.icon" size="large"/>
+        <VaIcon :name="metric.icon" size="large" />
       </template>
     </DataSectionItem>
   </div>
 </template>
-
