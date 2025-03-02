@@ -10,7 +10,7 @@ const columns = ref(
     { label: 'Email', key: 'email', sortable: true },
     { label: 'IP', key: 'ip', sortable: true },
     { label: 'Device', key: 'device', sortable: true },
-    { label: 'Time', key: 'time', sortable: true },
+    { label: 'Login Time', key: 'time', sortable: true },
   ]),
 )
 </script>

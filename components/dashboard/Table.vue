@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { type DataTableColumnSource, useModal } from 'vuestic-ui'
+import {type DataTableColumnSource, useModal} from 'vuestic-ui'
 
-import { type PropType, computed, toRef } from 'vue'
+import {type PropType, computed, toRef, ref} from 'vue'
 
 export type Pagination = {
   page: number
@@ -14,8 +14,8 @@ export type Sorting = {
   sortingOrder: 'asc' | 'desc' | null
 }
 
-import { useVModel } from '@vueuse/core'
-import type { User } from '@/types'
+import {useVModel} from '@vueuse/core'
+import type {User} from '@/types'
 
 const props = defineProps({
   users: {
@@ -26,9 +26,9 @@ const props = defineProps({
     type: Array as PropType<DataTableColumnSource<string>[]>,
     required: true,
   },
-  loading: { type: Boolean, default: false },
-  pagination: { type: Object as PropType<Pagination>, required: false },
-  sortBy: { type: String as PropType<Sorting['sortBy']>, required: true },
+  loading: {type: Boolean, default: false},
+  pagination: {type: Object as PropType<Pagination>, required: false},
+  sortBy: {type: String as PropType<Sorting['sortBy']>, required: true},
   sortingOrder: {
     type: String as PropType<Sorting['sortingOrder']>,
     default: null,
@@ -42,17 +42,38 @@ const emit = defineEmits<{
   (event: 'update:sortingOrder', sortingOrder: Sorting['sortingOrder']): void
 }>()
 
+const showModalEditUser = ref(false)
 const users = toRef(props, 'users')
+const selectedUser = ref<User | null>(null)
 const sortByVModel = useVModel(props, 'sortBy', emit)
 const sortingOrderVModel = useVModel(props, 'sortingOrder', emit)
 
-const totalPages = computed(() =>
-  props.pagination
-    ? Math.ceil(props.pagination.total / props.pagination.perPage)
-    : 0,
-)
+const {confirm} = useModal()
+const onChangeStatus = async (user) => {
+  const agreed = await confirm({
+    title: 'Change user status',
+    message: "Are you sure you want to change the status of this user?",
+    okText: user.active ? 'Deactivate' : 'Activate',
+    cancelText: 'Cancel',
+    size: 'small',
+    maxWidth: '380px',
+  })
 
-const { confirm } = useModal()
+  if (agreed) {
+    emit('edit-user', {...user, active: !user.active})
+  }
+}
+
+const onEditUser = (user: User) => {
+  selectedUser.value = {...user}
+  showModalEditUser.value = true
+}
+
+const onSubmitEditUser = () => {
+  emit('edit-user', selectedUser.value as User)
+  showModalEditUser.value = false
+}
+
 
 const onUserDelete = async (user: User) => {
   const agreed = await confirm({
@@ -74,11 +95,11 @@ const formatDate = (date: string) => new Date(date).toLocaleString()
 
 <template>
   <VaDataTable
-    v-model:sort-by="sortByVModel"
-    v-model:sorting-order="sortingOrderVModel"
-    :columns="columns"
-    :items="users"
-    :loading="$props.loading"
+      v-model:sort-by="sortByVModel"
+      v-model:sorting-order="sortingOrderVModel"
+      :columns="columns"
+      :items="users"
+      :loading="$props.loading"
   >
     <template #cell(email)="{ rowData }">
       <div class="flex items-center gap-2 max-w-[230px] ellipsis">
@@ -104,73 +125,35 @@ const formatDate = (date: string) => new Date(date).toLocaleString()
       </div>
     </template>
 
-    <template #cell(active)="{ rowData }">
-      <div class="ellipsis max-w-[230px]">
-        <VaSwitch v-model="rowData.active" color="info" size="small" />
-      </div>
-    </template>
-
     <template #cell(actions)="{ rowData }">
-      <div class="flex gap-2 justify-end">
-        <VaButton
-          preset="primary"
-          size="small"
-          icon="edit"
-          aria-label="Edit user"
-          @click="$emit('edit-user', rowData as User)"
+      <div class="flex gap-2 justify-center items-center">
+        <VaSwitch
+            :model-value="rowData.active"
+            color="info"
+            size="small"
+            @change="onChangeStatus(rowData as User)"
         />
         <VaButton
-          preset="primary"
-          size="small"
-          icon="delete"
-          color="danger"
-          aria-label="Delete user"
-          @click="onUserDelete(rowData as User)"
+            preset="primary"
+            icon="edit"
+            aria-label="Edit user"
+            @click="onEditUser(rowData as User)"
+        />
+        <VaButton
+            preset="primary"
+            icon="delete"
+            color="danger"
+            aria-label="Delete user"
+            @click="onUserDelete(rowData as User)"
         />
       </div>
     </template>
   </VaDataTable>
-
-  <div
-    v-if="$props.pagination"
-    class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center py-2"
-  >
-    <div>
-      <b>{{ $props.pagination.total }} results.</b>
-      Results per page
-      <VaSelect
-        v-model="$props.pagination.perPage"
-        class="!w-20"
-        :options="[10, 50, 100]"
-      />
-    </div>
-
-    <div v-if="totalPages > 1" class="flex">
-      <VaButton
-        preset="secondary"
-        icon="va-arrow-left"
-        aria-label="Previous page"
-        :disabled="$props.pagination.page === 1"
-        @click="$props.pagination.page--"
-      />
-      <VaButton
-        class="mr-2"
-        preset="secondary"
-        icon="va-arrow-right"
-        aria-label="Next page"
-        :disabled="$props.pagination.page === totalPages"
-        @click="$props.pagination.page++"
-      />
-      <VaPagination
-        v-model="$props.pagination.page"
-        buttons-preset="secondary"
-        :pages="totalPages"
-        :visible-pages="5"
-        :boundary-links="false"
-        :direction-links="false"
-      />
-    </div>
-  </div>
+  <ModalUserEdit
+      v-model:showModal="showModalEditUser"
+      v-model:formData="selectedUser"
+      @submit="onSubmitEditUser"
+  />
 </template>
 
 <style lang="css" scoped>
@@ -181,5 +164,6 @@ const formatDate = (date: string) => new Date(date).toLocaleString()
 ::v-deep(.va-data-table__table-th-wrapper) {
   font-weight: 500;
   font-size: 1rem;
+  text-align: center;
 }
 </style>

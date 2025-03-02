@@ -66,3 +66,11 @@
 .va-data-table .va-inner-loading__spinner {
   margin-top: 32px;
 }
+
+.va-modal__title {
+  font-size: 1rem !important;
+}
+
+.va-input-label {
+  font-size: 0.75rem !important;
+}
