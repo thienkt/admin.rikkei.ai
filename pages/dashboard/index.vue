@@ -7,10 +7,10 @@ import DataSection from '@/components/dashboard/DataSection.vue'
 const listUser = ref(generateUsers(5))
 const columns = ref(
   defineVaDataTableColumns([
-    { label: 'Email', key: 'email', sortable: true },
-    { label: 'IP', key: 'ip', sortable: true },
-    { label: 'Device', key: 'device', sortable: true },
-    { label: 'Login Time', key: 'time', sortable: true },
+    { label: 'Email', key: 'email' },
+    { label: 'IP', key: 'ip' },
+    { label: 'Device', key: 'device' },
+    { label: 'Login Time', key: 'time' },
   ]),
 )
 </script>
