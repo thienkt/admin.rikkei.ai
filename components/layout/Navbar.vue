@@ -5,8 +5,10 @@ import {signOut} from 'firebase/auth';
 import {useModal, useToast} from "vuestic-ui";
 import type {User} from "~/types";
 import {useCurrentUser} from "vuefire";
+import { useBreakpoint } from 'vuestic-ui'
 
 const auth = useFirebaseAuth()!
+const breakpoint = useBreakpoint()
 
 defineProps({
   isMobile: {type: Boolean, default: false},
@@ -77,7 +79,7 @@ function logout() {
                alt="avatar"
           />
         </VaAvatar>
-        <span class="leading-normal align-middle min-w-max ml-2 mr-1 text-lg"
+        <span v-if="breakpoint.mdUp" class="leading-normal align-middle min-w-max ml-2 mr-1 text-lg"
         >{{ user.email }}</span>
         <VaButton preset="secondary" color="textPrimary" @click="onLogout">
           <VaIcon name="logout" size="large"/>
